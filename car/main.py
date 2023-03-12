@@ -1,4 +1,5 @@
 import math
+import server.main
 from gpiozero import CamJamKitRobot
 
 target_x = None
