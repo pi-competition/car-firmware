@@ -14,6 +14,6 @@ DEVICE_INFO = {
 
 class Ping(Resource):
     def get(self):
-        print("ok")
+        DEVICE_INFO["uptime"] = int(os.popen("stat -c %Z /proc/ ").read())
         return success(DEVICE_INFO)
 
