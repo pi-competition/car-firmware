@@ -1,70 +1,78 @@
-import math
-import server.main
-from gpiozero import CamJamKitRobot
+import flask 
+from flask import request, jsonify
+from flask_restful import Resource, Api
+import threading
+import urllib
+import json
+import server.driver as driver
+import time
+app = flask.Flask(__name__)
+# app.config["DEBUG"] = True
+api = Api(app)
+app.debug = False
 
-target_x = None
-target_y = None
-self_x = None
-self_y = None
-self_angle = None
+DEVICES = []
 
-ctrl = CamJamKitRobot()
+controller_ip = None
 
-# TODO: TUNE
-max_curve_angle = 45
-speed = 1
+from server.routes.api.ping import Ping
+api.add_resource(Ping, '/api/ping')
+from server.routes.api.pos import Pos
+api.add_resource(Pos, '/api/pos')
+from server.routes.api.target import Target
+api.add_resource(Target, '/api/target')
 
-# ctrl.forward()
 
-def updateSelfPos(x, y, angle):
-    self_x = x
-    self_y = y
-    self_angle = angle
+def get_devices():
+    global DEVICES
+    try:
+        res = urllib.request.urlopen("http://127.0.0.1:5000/devices").read()
+    except:
+        return print("RADAR IS OFFLINE")
+    DEVICES = json.loads(res.decode("utf-8"))["data"]["devices"]
 
-def updateTargetPos(x, y):
-    target_x = x
-    target_y = y
+    for device in DEVICES:
+        if device["ip"] != None:
+            try:
+                res = urllib.request.urlopen(f"http://{device['ip']}:5000/api/ping").read()
+                j = json.loads(res.decode("utf-8"))
+                if(not j["success"]):
+                    device["status"] = "offline"
+                    device["info"] = None
+                    continue
+                # j = json.loads(res.decode("utf-8"))
+                device["info"] = j
+                if j["data"]["type"] == "CONTROL":
+                    # we done found controller
+                    controller_ip = device["ip"]
+            except:
+                device["status"] = "offline"
+                device["info"] = None
+        else:
+            device["status"] = "offline"
+            device["info"] = None
+    print(DEVICES)
 
-def updateSpeed(speed_):
-    speed = speed_
 
-def drive(angle):
-    curve_left = 0
-    curve_right = 0
-    if angle < 0: curve_left = abs(angle)/max_curve_angle
-    elif angle > 0: curve_right = angle/max_curve_angle
-    ctrl.forward(speed=speed, curve_left=curve_left, curve_right=curve_right)
 
-def angle_correction():
-    dx = target_x - self_x
-    if dx == 0: dx = 0.0001
-    dy = target_y - self_y
-    # pronounced they-ta
-    theta = math.atan(dy/dx)
-    # now, compensate into a bearing
-    if dx < 0:
-        # negi, we work off 3/2 pi (270)
-        # and then add mafs
-        theta = (3/2) * math.pi  - theta
-    else:
-        theta = (1/2) * math.pi - theta
 
-    # okay now do we turn left or right
-    if self_angle == theta: return 0
 
-    # turning left is as such:
-    turning_left = self_angle - theta
-    turning_left += 2*math.pi
-    turning_left %= 2*math.pi
 
-    turning_right = theta - self_angle
-    turning_right += 2*math.pi
-    turning_right %= 2*math.pi
+get_devices()
+threading.Timer(60, get_devices).start()
+def run():
+    app.run(port=5001, host="0.0.0.0", threaded=False)
 
-    if turning_left < turning_right:
-        return -turning_left
-    else:
-        return turning_right
+comms_thread = threading.Thread(target=run)
+comms_thread.start()
 
-def main():
-    drive(angle_correction())
+print("does this work")
+
+#while True:
+#    driver.main()
+#    time.sleep(0.1)
+
+print("main thread says goodbye")
+
+#while True:
+#    driver.fakeIt()

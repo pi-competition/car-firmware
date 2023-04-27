@@ -10,6 +10,7 @@ DEVICE_INFO = {
     "type": "CAR",
     "hostname": os.environ["HOSTNAME"] if "HOSTNAME" in os.environ else "unknown",
     "status": "online",
+    "id": 38, #  ArUco tag value
 }
 
 class Ping(Resource):

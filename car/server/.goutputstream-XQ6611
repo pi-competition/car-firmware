@@ -4,16 +4,23 @@ from flask_restful import Resource, Api
 import threading
 import urllib
 import json
-
+import driver
+import time
 app = flask.Flask(__name__)
-app.config["DEBUG"] = True
+# app.config["DEBUG"] = True
 api = Api(app)
 app.debug = False
 
 DEVICES = []
 
+controller_ip = None
+"""
 from server.routes.api.ping import Ping
 api.add_resource(Ping, '/api/ping')
+from server.routes.api.pos import Pos
+api.add_resource(Pos, '/api/pos')
+from server.routes.api.target import Target
+api.add_resource(Target, '/api/target')
 
 
 def get_devices():
@@ -35,6 +42,9 @@ def get_devices():
                     continue
                 # j = json.loads(res.decode("utf-8"))
                 device["info"] = j
+                if j["data"]["type"] == "CONTROL":
+                    # we done found controller
+                    controller_ip = device["ip"]
             except:
                 device["status"] = "offline"
                 device["info"] = None
@@ -57,6 +67,10 @@ comms_thread = threading.Thread(target=run)
 comms_thread.start()
 
 print("does this work")
+"""
+#while True:
+#    driver.drive(0) # driver.angle_correction())
+#    time.sleep(0.5)
 
-
-
+#while True:
+driver.fakeItTillYouMakeIt()
