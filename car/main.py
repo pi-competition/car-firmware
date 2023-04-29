@@ -6,6 +6,7 @@ import urllib
 import json
 import server.driver as driver
 import time
+import paho.mqtt.client as mqtt
 app = flask.Flask(__name__)
 # app.config["DEBUG"] = True
 api = Api(app)
@@ -22,6 +23,7 @@ api.add_resource(Pos, '/api/pos')
 from server.routes.api.target import Target
 api.add_resource(Target, '/api/target')
 
+client = mqtt.Client("controller_telemetry")
 
 def get_devices():
     global DEVICES
@@ -44,6 +46,8 @@ def get_devices():
                 device["info"] = j
                 if j["data"]["type"] == "CONTROL":
                     # we done found controller
+                    if controller_ip != device["ip"]:
+                        client.connect(device["ip"]) # reconnect cuz controller ip changed somehow
                     controller_ip = device["ip"]
             except:
                 device["status"] = "offline"
@@ -51,6 +55,9 @@ def get_devices():
         else:
             device["status"] = "offline"
             device["info"] = None
+            if j["data"]["type"] == "CONTROL":
+                # we done found controller
+                controller_ip = None
     print(DEVICES)
 
 
@@ -65,6 +72,25 @@ def run():
 
 comms_thread = threading.Thread(target=run)
 comms_thread.start()
+
+
+def telemetry():
+    threading.Timer(0.1, telemetry).start() # this is probably too quick, alternatively move this to the bottom of the func
+    temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").read()
+    temp = int(temp) / 1000
+    cpu = os.popen("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'").read()
+    cpu = float(cpu)
+    total, used, free = map(int, os.popen('free -t -m').readlines()[-1].split()[1:])
+    if controller_ip != None:
+        client.publish("car_temp", temp)
+        client.publish("car_cpu", cpu)
+        client.publish("car_ram_used", used)
+        client.publish("car_ram_free", free)
+        client.publish("car_ram_total", total)
+
+
+telem = threading.Timer(0.1, telemetry)
+telem.start()
 
 print("does this work")
 
