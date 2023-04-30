@@ -23,6 +23,8 @@ from server.routes.api.pos import Pos
 api.add_resource(Pos, '/api/pos')
 from server.routes.api.target import Target
 api.add_resource(Target, '/api/target')
+from server.routes.api.reset import Reset
+api.add_resource(Reset, '/api/reset')
 
 client = mqtt.Client("controller_telemetry")
 
