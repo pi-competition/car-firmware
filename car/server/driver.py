@@ -90,6 +90,9 @@ def angle_correction():
 
     print(correction)
 
+    # MOTORS ARE WIRED BACKWARDS
+    correction *= -1
+
     if (abs(correction) > math.pi * (1/4)):
         print("spinning since correction", correction)
         # more than 45deg, should prolly spin
