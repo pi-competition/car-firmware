@@ -15,6 +15,6 @@ DEVICE_INFO = {
 
 class Ping(Resource):
     def get(self):
-        DEVICE_INFO["uptime"] = int(os.popen("cat /proc/uptime").read().split(" ")[0])
+        DEVICE_INFO["uptime"] = float(os.popen("cat /proc/uptime").read().split(" ")[0])
         return success(DEVICE_INFO)
 
