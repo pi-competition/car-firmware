@@ -25,6 +25,10 @@ from server.routes.api.target import Target
 api.add_resource(Target, '/api/target')
 from server.routes.api.reset import Reset
 api.add_resource(Reset, '/api/reset')
+from server.routes.api.enable import Enable
+api.add_resource(Enable, '/api/enable')
+from server.routes.api.disable import Disable
+api.add_resource(Disable, '/api/disable')
 
 client = mqtt.Client("controller_telemetry")
 

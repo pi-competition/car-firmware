@@ -8,6 +8,7 @@ target_y = None
 self_x = None
 self_y = None
 self_angle = None
+enable = False
 
 ctrl = CamJamKitRobot()
 
@@ -75,6 +76,7 @@ def bearingBetween2Points(s_x, s_y, d_x, d_y):
 
 
 def angle_correction():
+    if not enable: return None
     global self_angle
     if target_x is None: return None
     target_dir = bearingBetween2Points(self_x, self_y, target_x, target_y)
