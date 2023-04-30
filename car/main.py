@@ -90,14 +90,14 @@ comms_thread.start()
 
 
 def telemetry():
-    print("data time")
+    # print("data time")
     threading.Timer(1, telemetry).start() # this is probably too quick, alternatively move this to the bottom of the func
     temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").read()
     temp = int(temp) / 1000
     cpu = os.popen("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'").read()
     cpu = float(cpu)
     total, used, free = map(int, os.popen('free -t -m').readlines()[-1].split()[1:])
-    print(controller_ip)
+    # print(controller_ip)
     if controller_ip != None:
         print(temp)
         client.publish("car_temp", temp)

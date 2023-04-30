@@ -79,12 +79,15 @@ def angle_correction():
     target_dir = bearingBetween2Points(self_x, self_y, target_x, target_y)
     # target_dir += 2*math.pi
     # self_angle += 2*math.pi
+    print(target_dir, self_angle)
     correction = target_dir - self_angle
     correction += 2*math.pi
     correction %= 2*math.pi
 
     if correction > math.pi:
         correction = -(2*math.pi - correction)
+
+    print(correction)
 
     if (abs(correction) > math.pi * (1/4)):
         print("spinning since correction", correction)

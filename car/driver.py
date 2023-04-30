@@ -2,6 +2,8 @@ import math
 import server.main
 from gpiozero import CamJamKitRobot
 
+raise Exception("THIS FILE SHOULD NOT BE LOADED")
+
 target_x = None
 target_y = None
 self_x = None
