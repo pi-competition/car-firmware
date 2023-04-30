@@ -12,7 +12,7 @@ self_angle = None
 ctrl = CamJamKitRobot()
 
 # TODO: TUNE
-max_curve_angle = math.pi / 4
+max_curve_angle = math.pi / 2
 speed = 0.7
 
 # ctrl.forward()
@@ -77,7 +77,7 @@ def bearingBetween2Points(s_x, s_y, d_x, d_y):
 def angle_correction():
     if target_x is None: return None
     target_dir = bearingBetween2Points(self_x, self_y, target_x, target_y)
-    correction = target_dir = self_angle
+    correction = target_dir - self_angle
 
     if (abs(correction) > math.pi * (1/4)):
         print("spinning since correction", correction)
@@ -114,7 +114,7 @@ def angle_correction():
     turning_right %= 2*math.pi
     """
     
-    scale = abs(correction) / (math.pi * (1/4))
+    scale = abs(correction) / (math.pi * (1/2))
     if scale > 1: scale = 1
     if correction < 0:
         ctrl.forward(speed=speed, curve_left = scale)
