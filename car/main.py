@@ -99,7 +99,7 @@ def telemetry():
     total, used, free = map(int, os.popen('free -t -m').readlines()[-1].split()[1:])
     # print(controller_ip)
     if controller_ip != None:
-        print(temp)
+        # print(temp)
         client.publish("car_temp", temp)
         client.publish("car_cpu", cpu)
         client.publish("car_ram_used", used)
