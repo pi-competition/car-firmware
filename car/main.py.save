@@ -27,7 +27,7 @@ api.add_resource(Target, '/api/target')
 client = mqtt.Client("controller_telemetry")
 
 def get_devices():
-    global DEVICES, controller_ip
+    global DEVICES
     try:
         res = urllib.request.urlopen("http://127.0.0.1:5000/devices").read()
     except:
@@ -38,25 +38,18 @@ def get_devices():
         print("attempt")
         print(device)
         if device["ip"] != None:
-            print("HELLO WORL")
             try:
-                print("2")
-                res = urllib.request.urlopen(f"http://{device['ip']}:5001/api/ping").read()
-                print("3")
+                res = urllib.request.urlopen(f"http://{device['ip']}:5000/api/ping").read()
                 j = json.loads(res.decode("utf-8"))
-                print(j)
                 if(not j["success"]):
                     device["status"] = "offline"
                     device["info"] = None
                     continue
                 # j = json.loads(res.decode("utf-8"))
-                print(j)
-                print("4")
                 device["info"] = j
+                print(
                 if j["data"]["type"] == "CONTROL":
                     print("hello controller")
-                    print(device["ip"])
-                    print(controller_ip)
                     # we done found controller
                     if controller_ip != device["ip"]:
                         print("connecting")
@@ -95,9 +88,7 @@ def telemetry():
     cpu = os.popen("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'").read()
     cpu = float(cpu)
     total, used, free = map(int, os.popen('free -t -m').readlines()[-1].split()[1:])
-    print(controller_ip)
     if controller_ip != None:
-        print(temp)
         client.publish("car_temp", temp)
         client.publish("car_cpu", cpu)
         client.publish("car_ram_used", used)
