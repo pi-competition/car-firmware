@@ -29,6 +29,7 @@ class Pos(Resource):
 #        print("update pos")
         data = request.get_json()
         driver.updateSelfPos(data["x"], data["y"], data["angle"])
+        print("updated", data["angle"])
         # driver.drive(driver.angleCorrection())
         driver.main()
         print("mained")

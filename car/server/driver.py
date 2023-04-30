@@ -75,6 +75,7 @@ def bearingBetween2Points(s_x, s_y, d_x, d_y):
 
 
 def angle_correction():
+    global self_angle
     if target_x is None: return None
     target_dir = bearingBetween2Points(self_x, self_y, target_x, target_y)
     # target_dir += 2*math.pi
