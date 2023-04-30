@@ -77,7 +77,13 @@ def bearingBetween2Points(s_x, s_y, d_x, d_y):
 def angle_correction():
     if target_x is None: return None
     target_dir = bearingBetween2Points(self_x, self_y, target_x, target_y)
+    # target_dir += 2*math.pi
+    # self_angle += 2*math.pi
     correction = target_dir - self_angle
+    correction += 2*math.pi
+    correction %= 2*math.pi
+    if correction > math.pi:
+        correction = -(2*math.pi - correction)
 
     if (abs(correction) > math.pi * (1/4)):
         print("spinning since correction", correction)
@@ -128,26 +134,6 @@ def angle_correction():
     else:
         return turning_right
 
-def fakeIt():
-    ctrl.forward(speed=speed)
-    time.sleep(1.7)
-    ctrl.left()
-    time.sleep(0.3)
-
-    ctrl.forward(speed=speed)
-    time.sleep(1.7)
-    ctrl.left()
-    time.sleep(0.3)
-
-    ctrl.forward(speed=speed)
-    time.sleep(1.7)
-    ctrl.left()
-    time.sleep(0.3)
-
-    ctrl.forward(speed=speed)
-    time.sleep(1.7)
-    ctrl.left()
-    time.sleep(0.3)
 
 def main():
     drive(angle_correction())
