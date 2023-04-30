@@ -82,6 +82,7 @@ def angle_correction():
     correction = target_dir - self_angle
     correction += 2*math.pi
     correction %= 2*math.pi
+
     if correction > math.pi:
         correction = -(2*math.pi - correction)
 
