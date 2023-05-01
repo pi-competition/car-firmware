@@ -4,10 +4,18 @@ import os
 from server.utils.response import success
 import server.driver as driver
 from threading import Timer
+import os
+
+timestop = 0.2
+if "CAR_TIMESTOP" in os.environ.keys():
+    try:
+        timestop = float(os.environ["CAR_TIMESTOP"])
+    except:
+        pass
 
 dstop = driver.stop
 
-countdown = Timer(0.2, dstop)
+countdown = Timer(timestop, dstop)
 countdown.start()
 
 def resetTimer():
@@ -17,7 +25,7 @@ def resetTimer():
             countdown.cancel()
     except:
         pass
-    countdown = Timer(0.2, driver.stop)
+    countdown = Timer(timestop, driver.stop)
     countdown.start()
 
 class Pos(Resource):
