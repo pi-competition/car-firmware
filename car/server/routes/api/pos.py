@@ -7,7 +7,7 @@ from threading import Timer
 
 dstop = driver.stop
 
-countdown = Timer(0.3, dstop)
+countdown = Timer(0.2, dstop)
 countdown.start()
 
 def resetTimer():
@@ -17,7 +17,7 @@ def resetTimer():
             countdown.cancel()
     except:
         pass
-    countdown = Timer(0.3, driver.stop)
+    countdown = Timer(0.2, driver.stop)
     countdown.start()
 
 class Pos(Resource):

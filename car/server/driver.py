@@ -99,9 +99,9 @@ def angle_correction():
         print("spinning since correction", correction)
         # more than 45deg, should prolly spin
         if correction < 0:
-            ctrl.left()
+            ctrl.left(speed=speed)
         else:
-            ctrl.right()
+            ctrl.right(speed=speed)
         return None
     """
     dx = target_x - self_x
