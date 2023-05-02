@@ -109,6 +109,11 @@ def telemetry():
         client.publish("car_ram_used", used)
         client.publish("car_ram_free", free)
         client.publish("car_ram_total", total)
+        try: # i have trust issues ok
+            client.publish("car_correction", driver.correction)
+            client.publish("car_distance", driver.d)
+        except:
+            pass
 
 
 telem = threading.Timer(1, telemetry)

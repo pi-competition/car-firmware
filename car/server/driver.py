@@ -9,6 +9,8 @@ self_x = None
 self_y = None
 self_angle = None
 enable = False
+d = 0
+correction = 0
 
 ctrl = CamJamKitRobot()
 
@@ -49,7 +51,7 @@ def clamp(val, lo, hi):
 def timeForDrive(theta_, d_):
     theta = abs(theta_)
     d = abs(d_)
-    m = 0.005
+    m = 0.01
     k = 0.8/math.pi
     # y = md - theta*k
     val = m*d - theta*k
@@ -129,6 +131,8 @@ def bearingBetween2Points(s_x, s_y, d_x, d_y):
 
 
 def angle_correction():
+    global correction
+    global d
     if not enable: return None
     global self_angle
     if target_x is None: return None
@@ -145,17 +149,21 @@ def angle_correction():
 
     print(correction)
 
-    # MOTORS ARE WIRED BACKWARDS
-    correction *= -1
+    
+    d2 = (self_x - target_x) ** 2 + (self_y - target_y) ** 2
+    d = math.sqrt(d2)
 
-    if (abs(correction) > math.pi * (1/4)):
-        print("spinning since correction", correction)
+    # MOTORS ARE WIRED BACKWARDS
+    correction_ = correction * -1
+
+    if (abs(correction_) > math.pi * (1/4)):
+        print("spinning since correction", correction_)
         # more than 45deg, should prolly spin
         if correction < 0:
             ctrl.left(speed=speed)
         else:
             ctrl.right(speed=speed)
-        resetTimer(val=timeForSpin(correction))
+        resetTimer(val=timeForSpin(correction_))
         return None
     """
     dx = target_x - self_x
@@ -184,15 +192,13 @@ def angle_correction():
     turning_right %= 2*math.pi
     """
     
-    scale = abs(correction) / (math.pi * (1/2))
+    scale = abs(correction_) / (math.pi * (1/2))
     if scale > 1: scale = 1
-    if correction < 0:
+    if correction_ < 0:
         ctrl.forward(speed=speed, curve_left = scale)
     else:
         ctrl.forward(speed=speed, curve_right = scale)
 
-    d2 = (self_x - target_x) ** 2 + (self_y - target_y) ** 2
-    d = math.sqrt(d2)
 
     resetTimer(timeForDrive(correction, d))
 
