@@ -17,6 +17,10 @@ ctrl = CamJamKitRobot()
 from threading import Timer
 import os
 
+def stop():
+    print("sropped")
+    ctrl.stop()
+
 timestop = 0.2
 if "CAR_TIMESTOP" in os.environ.keys():
     try:
@@ -24,7 +28,7 @@ if "CAR_TIMESTOP" in os.environ.keys():
     except:
         pass
 
-dstop = driver.stop
+dstop = stop
 
 countdown = Timer(timestop, dstop)
 countdown.start()
@@ -93,9 +97,6 @@ def updateTargetPos(x, y):
 def updateSpeed(speed_):
     speed = speed_
 
-def stop():
-    print("sropped")
-    ctrl.stop()
 
 def drive(angle):
     return None
