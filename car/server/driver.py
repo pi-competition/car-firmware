@@ -160,7 +160,7 @@ def angle_correction():
     if (abs(correction_) > math.pi * (1/4)):
         print("spinning since correction", correction_)
         # more than 45deg, should prolly spin
-        if correction < 0:
+        if correction_ < 0:
             ctrl.left(speed=speed)
         else:
             ctrl.right(speed=speed)
