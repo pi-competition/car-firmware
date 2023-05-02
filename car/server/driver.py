@@ -2,6 +2,38 @@ import math
 import time
 #import server.main
 from gpiozero import CamJamKitRobot
+import json
+
+cfg = {}
+
+defaultload = lambda k, dct, defl: dct[k] if k in dct.keys() else defl
+speed = 0.6
+tfd_m = 0.002
+tfd_k = 1.2/math.pi
+tfs_k = 0.1/math.pi
+timestop = 0.2
+ts_high = 0.6
+spinspeed = speed
+
+
+def rlconfig():
+    global cfg, speed, tfd_m, tfd_k, tfs_k, timestop, ts_high, spinspeed
+    with open("abbas.json") as f:
+        cfg = json.loads(f.read())
+    speed = defaultload("speed", cfg, 0.6) # 0.6 if not "speed" in cfg.keys() else cfg["speed"]
+
+    tfd_m = defaultload("speedscale", cfg, 0.002)
+    tfd_k = defaultload("speedpenalty", cfg, 1.2/math.pi)
+
+    tfs_k = defaultload("spinscale", cfg, 0.1/math.pi)
+
+    timestop = defaultload("ts_low", cfg, 0.2)# 0.2 if not "ts_low" in cfg.keys() else cfg["ts_low"]
+    ts_high = defaultload("ts_high", cfg, 0.6) # 0.6 if not "ts_high" in cfg.keys() else cfg["ts_high"]
+
+    spinspeed = defaultload("spinspeed", cfg, speed)
+
+rlconfig()
+
 
 target_x = None
 target_y = None
@@ -21,12 +53,17 @@ def stop():
     print("sropped")
     ctrl.stop()
 
-timestop = 0.2
-if "CAR_TIMESTOP" in os.environ.keys():
-    try:
-        timestop = float(os.environ["CAR_TIMESTOP"])
-    except:
-        pass
+
+
+# TODO: TUNE
+max_curve_angle = math.pi / 2
+
+
+# if "CAR_TIMESTOP" in os.environ.keys():
+    # try:
+        # timestop = float(os.environ["CAR_TIMESTOP"])
+    # except:
+        # pass
 
 dstop = stop
 
@@ -43,9 +80,6 @@ def resetTimer(val = timestop):
     countdown = Timer(val, dstop)
     countdown.start()
 
-# TODO: TUNE
-max_curve_angle = math.pi / 2
-speed = 0.6
 
 def clamp(val, lo, hi):
     if val < lo: return lo
@@ -55,24 +89,24 @@ def clamp(val, lo, hi):
 def timeForDrive(theta_, d_):
     theta = abs(theta_)
     d = abs(d_)
-    m = 0.005
-    k = 0.8/math.pi
+    m = tfd_m
+    k = tfd_k
     # y = md - theta*k
     val = m*d - theta*k
     print("time for drive")
     print(val, theta_, d_)
-    return clamp(val, 0.1, 0.6)
+    return clamp(val, timestop, ts_high)
 
 def timeForSpin(theta_):
     theta = abs(theta_)
-    k = 0.1/math.pi
+    k = tfs_k
 
     val = k * theta
 
     print("time for spin")
     print(val, theta_)
 
-    return clamp(val, 0.1, 0.6)
+    return clamp(val, timestop, ts_high)
 
 
 # ctrl.forward()
@@ -161,9 +195,9 @@ def angle_correction():
         print("spinning since correction", correction_)
         # more than 45deg, should prolly spin
         if correction_ < 0:
-            ctrl.left(speed=speed)
+            ctrl.left(speed=spinspeed)
         else:
-            ctrl.right(speed=speed)
+            ctrl.right(speed=spinspeed)
         resetTimer(val=timeForSpin(correction_))
         return None
     """

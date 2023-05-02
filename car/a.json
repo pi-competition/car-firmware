@@ -1,0 +1,9 @@
+{
+  "speed": 0.6,
+  "speedscale": 0.002,
+  "speedpenalty": 0.382,
+  "spinscale": 0.0318,
+  "ts_low": 0.2,
+  "ts_high": 0.6,
+  "spinspeed": 0.7
+}
