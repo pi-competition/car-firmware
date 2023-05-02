@@ -40,7 +40,7 @@ def resetTimer(val = timestop):
             countdown.cancel()
     except:
         pass
-    countdown = Timer(val, driver.stop)
+    countdown = Timer(val, dstop)
     countdown.start()
 
 # TODO: TUNE
