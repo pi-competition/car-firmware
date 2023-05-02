@@ -95,7 +95,7 @@ comms_thread.start()
 
 def telemetry():
     # print("data time")
-    threading.Timer(1, telemetry).start() # this is probably too quick, alternatively move this to the bottom of the func
+    threading.Timer(0.5, telemetry).start() # this is probably too quick, alternatively move this to the bottom of the func
     temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").read()
     temp = int(temp) / 1000
     cpu = os.popen("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'").read()
@@ -116,7 +116,7 @@ def telemetry():
             pass
 
 
-telem = threading.Timer(1, telemetry)
+telem = threading.Timer(0.5, telemetry)
 telem.start()
 
 print("does this work")
