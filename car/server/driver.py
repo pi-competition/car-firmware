@@ -12,9 +12,62 @@ enable = False
 
 ctrl = CamJamKitRobot()
 
+from threading import Timer
+import os
+
+timestop = 0.2
+if "CAR_TIMESTOP" in os.environ.keys():
+    try:
+        timestop = float(os.environ["CAR_TIMESTOP"])
+    except:
+        pass
+
+dstop = driver.stop
+
+countdown = Timer(timestop, dstop)
+countdown.start()
+
+def resetTimer(val = timestop):
+    global countdown
+    try:
+        if countdown.is_alive():
+            countdown.cancel()
+    except:
+        pass
+    countdown = Timer(val, driver.stop)
+    countdown.start()
+
 # TODO: TUNE
 max_curve_angle = math.pi / 2
-speed = 0.7
+speed = 0.3
+
+def clamp(val, lo, hi):
+    if val < lo: return lo
+    if val > hi: return hi
+    return val
+
+def timeForDrive(theta_, d_):
+    theta = abs(theta_)
+    d = abs(d_)
+    m = 0.005
+    k = 0.8/math.pi
+    # y = md - theta*k
+    val = m*d - theta*k
+    print("time for drive")
+    print(val, theta_, d_)
+    return clamp(val, 0.1, 0.6)
+
+def timeForSpin(theta_):
+    theta = abs(theta_)
+    k = 0.1/math.pi
+
+    val = k * theta
+
+    print("time for spin")
+    print(val, theta_)
+
+    return clamp(val, 0.1, 0.6)
+
 
 # ctrl.forward()
 
@@ -102,6 +155,7 @@ def angle_correction():
             ctrl.left(speed=speed)
         else:
             ctrl.right(speed=speed)
+        resetTimer(val=timeForSpin(correction))
         return None
     """
     dx = target_x - self_x
@@ -136,6 +190,11 @@ def angle_correction():
         ctrl.forward(speed=speed, curve_left = scale)
     else:
         ctrl.forward(speed=speed, curve_right = scale)
+
+    d2 = (self_x - target_x) ** 2 + (self_y - target_y) ** 2
+    d = math.sqrt(d2)
+
+    resetTimer(timeForDrive(correction, d))
 
     return None
 
