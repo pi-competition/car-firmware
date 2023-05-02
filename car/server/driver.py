@@ -45,7 +45,7 @@ def resetTimer(val = timestop):
 
 # TODO: TUNE
 max_curve_angle = math.pi / 2
-speed = 0.3
+speed = 0.6
 
 def clamp(val, lo, hi):
     if val < lo: return lo
@@ -55,7 +55,7 @@ def clamp(val, lo, hi):
 def timeForDrive(theta_, d_):
     theta = abs(theta_)
     d = abs(d_)
-    m = 0.01
+    m = 0.005
     k = 0.8/math.pi
     # y = md - theta*k
     val = m*d - theta*k
